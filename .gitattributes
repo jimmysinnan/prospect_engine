@@ -1,0 +1,10 @@
+# Force CRLF for Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Python and text files: LF
+*.py text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+*.env text eol=lf
+*.example text eol=lf
