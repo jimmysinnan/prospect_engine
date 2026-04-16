@@ -1,7 +1,7 @@
-streamlit>=1.35
-anthropic>=0.30
+streamlit>=1.35,<2.0
+anthropic>=0.30,<1.0
 python-dotenv>=1.0
 requests>=2.31
-twilio>=9.0
+twilio>=9.0,<10.0
 pandas>=2.0
 pytest>=8.0

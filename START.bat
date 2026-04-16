@@ -16,6 +16,17 @@ if not exist venv\ (
 
 call venv\Scripts\activate.bat
 pip install -r requirements.txt -q --disable-pip-version-check
+if errorlevel 1 (
+    echo ERREUR : L'installation des dependances a echoue. Verifiez votre connexion internet.
+    pause
+    exit /b 1
+)
 
-streamlit run app.py --server.port 8501 --browser.gatherUsageStats false --server.headless false
+if not exist app.py (
+    echo ERREUR : app.py introuvable. Verifiez que tous les fichiers sont presents.
+    pause
+    exit /b 1
+)
+
+streamlit run app.py --server.port 8501 --browser.gatherUsageStats false
 pause

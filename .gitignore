@@ -2,5 +2,11 @@
 venv/
 __pycache__/
 *.pyc
-data/leads.db
+*.pyo
+data/*.db
+data/*.sqlite
 .streamlit/
+*.log
+.DS_Store
+Thumbs.db
+prospect_engine.html
