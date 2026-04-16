@@ -1,6 +1,6 @@
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from twilio.rest import Client
 
@@ -34,7 +34,7 @@ def fetch_replies(since_minutes=60):
         return []
 
     client = Client(account_sid, auth_token)
-    since = datetime.utcnow() - timedelta(minutes=since_minutes)
+    since = datetime.now(timezone.utc) - timedelta(minutes=since_minutes)
 
     replies = []
     try:
