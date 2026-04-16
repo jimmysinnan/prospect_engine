@@ -68,6 +68,19 @@ with tab_settings:
             set_key(str(ENV_FILE), "ANTHROPIC_API_KEY", api_key)
             st.success("Clé sauvegardée dans .env")
 
+    with st.expander("🗺 Google Maps (téléphone & site web des leads)"):
+        st.caption("Permet d'utiliser Google Maps comme source de leads avec téléphone et site web. Gratuit jusqu'à ~6 000 recherches/mois.")
+        gmaps_key = st.text_input(
+            "Clé API Google Maps",
+            value=os.getenv("GOOGLE_MAPS_API_KEY", ""),
+            type="password",
+            help="console.cloud.google.com → Places API → Activer → Créer une clé"
+        )
+        if st.button("Sauvegarder la clé Google Maps"):
+            ENV_FILE.touch(exist_ok=True)
+            set_key(str(ENV_FILE), "GOOGLE_MAPS_API_KEY", gmaps_key)
+            st.success("Clé sauvegardée dans .env")
+
     with st.expander("📧 Email (SMTP/IMAP)"):
         col1, col2 = st.columns(2)
         with col1:
@@ -125,6 +138,7 @@ with tab_search:
     from modules.bodacc import enrich_leads
     from modules.scoring import score_leads_batch
     from modules.export import leads_to_csv
+    from modules.google_maps import search_places
     import json
     from datetime import date
 
@@ -133,20 +147,44 @@ with tab_search:
     with col_form:
         st.subheader("🎯 Configurer la recherche")
         with st.form("search_form"):
-            secteur = st.text_input("Secteur d'activité ou code APE", placeholder="Ex: expertise comptable, 6630Z, notaire…")
+            # Source selector
+            has_gmaps = bool(os.getenv("GOOGLE_MAPS_API_KEY", ""))
+            source_options = ["SIRENE (registre officiel — sans contacts)"]
+            if has_gmaps:
+                source_options.append("Google Maps (téléphone + site web disponibles)")
+            source = st.radio(
+                "Source de données",
+                source_options,
+                help="Google Maps donne le téléphone et le site web des entreprises qui ont une fiche Google."
+            )
+            use_gmaps = "Google Maps" in source
+
+            secteur = st.text_input(
+                "Secteur d'activité",
+                placeholder="Ex: expert comptable, notaire, agence immobilière…"
+            )
             col1, col2 = st.columns(2)
             with col1:
-                departement = st.text_input("Département(s)", placeholder="Ex: 69, 75, 13")
+                if use_gmaps:
+                    localisation = st.text_input("Localisation", placeholder="Ex: Martinique, Fort-de-France, 972…")
+                else:
+                    departement = st.text_input("Département(s)", placeholder="Ex: 972, 69, 75")
             with col2:
-                nb_leads = st.selectbox("Nombre de leads", [50, 100, 150, 200, 300], index=2)
+                nb_leads = st.selectbox("Nombre de leads", [25, 50, 100, 150, 200], index=2)
 
-            col3, col4 = st.columns(2)
-            with col3:
-                taille = st.selectbox("Taille entreprise", ["Toutes", "TPE (0-9)", "PME (10-49)", "ETI (50-249)", "Grande (250+)"], index=0)
-            with col4:
-                age_max = st.selectbox("Ancienneté max", ["Toutes", "3 mois", "6 mois", "1 an", "3 ans", "5 ans"], index=0)
+            if not use_gmaps:
+                col3, col4 = st.columns(2)
+                with col3:
+                    taille = st.selectbox("Taille entreprise", ["Toutes", "TPE (0-9)", "PME (10-49)", "ETI (50-249)", "Grande (250+)"], index=0)
+                with col4:
+                    age_max = st.selectbox("Ancienneté max", ["Toutes", "3 mois", "6 mois", "1 an", "3 ans", "5 ans"], index=0)
+                use_bodacc = st.checkbox("Enrichir avec Bodacc (signaux de cession/création)", value=True)
+            else:
+                taille = "Toutes"
+                age_max = "Toutes"
+                use_bodacc = False
+                st.caption("ℹ️ Google Maps fournit téléphone (~70%) et site web (~60%) pour les entreprises avec une fiche Google active.")
 
-            use_bodacc = st.checkbox("Enrichir avec Bodacc (signaux de cession/création)", value=True)
             submitted = st.form_submit_button("⚡ Générer les leads", use_container_width=True)
 
     with col_stats:
@@ -171,28 +209,38 @@ with tab_search:
         taille_map = {"Toutes": None, "TPE (0-9)": "0", "PME (10-49)": "1", "ETI (50-249)": "2", "Grande (250+)": "3"}
         age_map = {"Toutes": None, "3 mois": 3, "6 mois": 6, "1 an": 12, "3 ans": 36, "5 ans": 60}
 
-        progress = st.progress(0, text="Interrogation SIRENE…")
+        if use_gmaps:
+            progress = st.progress(0, text="Recherche Google Maps…")
+            try:
+                with st.spinner("Interrogation Google Maps…"):
+                    leads_raw = search_places(secteur, localisation, nb=nb_leads)
+            except ValueError as e:
+                st.error(str(e))
+                st.stop()
+            if not leads_raw:
+                st.error("Aucun résultat Google Maps. Essayez une localisation plus large (ex: Martinique au lieu de Fort-de-France).")
+                st.stop()
+            has_tel = sum(1 for l in leads_raw if l.get("tel"))
+            progress.progress(40, text=f"{len(leads_raw)} entreprises trouvées — {has_tel} avec téléphone. Scoring IA…")
+        else:
+            progress = st.progress(0, text="Interrogation SIRENE…")
+            with st.spinner("Recherche en cours…"):
+                leads_raw = search_companies(
+                    secteur=secteur,
+                    departement=departement,
+                    nb=nb_leads,
+                    taille=taille_map[taille],
+                    age_max_mois=age_map[age_max]
+                )
+            if not leads_raw:
+                st.error("Aucun résultat SIRENE. Essayez un secteur plus large ou un autre département.")
+                st.stop()
+            progress.progress(30, text=f"{len(leads_raw)} entreprises trouvées. Enrichissement Bodacc…")
+            if use_bodacc:
+                with st.spinner("Enrichissement Bodacc…"):
+                    leads_raw = enrich_leads(leads_raw)
 
-        with st.spinner("Recherche en cours…"):
-            leads_raw = search_companies(
-                secteur=secteur,
-                departement=departement,
-                nb=nb_leads,
-                taille=taille_map[taille],
-                age_max_mois=age_map[age_max]
-            )
-
-        if not leads_raw:
-            st.error("Aucun résultat SIRENE. Essayez un secteur plus large ou un autre département.")
-            st.stop()
-
-        progress.progress(30, text=f"{len(leads_raw)} entreprises trouvées. Enrichissement Bodacc…")
-
-        if use_bodacc:
-            with st.spinner("Enrichissement Bodacc…"):
-                leads_raw = enrich_leads(leads_raw)
-
-        progress.progress(55, text="Scoring IA (Claude)…")
+        progress.progress(55, text="Scoring IA (Claude Haiku)…")
 
         api_key_check = os.getenv("ANTHROPIC_API_KEY", "")
         if not api_key_check:
@@ -257,9 +305,15 @@ with tab_search:
                     st.markdown(f"**Ancienneté :** {lead.get('anciennete_mois', 0)} mois")
                     st.markdown(f"**Source :** {lead.get('source', '')}")
                     st.markdown(f"**Signaux :** {' · '.join(signaux) if signaux else '—'}")
+                    if lead.get("tel"):
+                        st.markdown(f"**Téléphone :** {lead.get('tel')}")
+                    if lead.get("website"):
+                        st.markdown(f"**Site web :** {lead.get('website')}")
                 with col_b:
-                    st.markdown(f"**SIRET :** `{lead.get('siret', '')}`")
+                    st.markdown(f"**SIRET :** `{lead.get('siret', '') or '—'}`")
                     st.markdown(f"**Raison :** {lead.get('raison', '')}")
+                    if lead.get("rating"):
+                        st.markdown(f"**Google :** ⭐ {lead.get('rating')} ({lead.get('nb_avis', 0)} avis)")
 
                 st.markdown("**Message LinkedIn :**")
                 st.text_area("", value=lead.get("message_linkedin", ""), height=100, key=f"msg_li_{lead.get('siret', '')}", label_visibility="collapsed")
