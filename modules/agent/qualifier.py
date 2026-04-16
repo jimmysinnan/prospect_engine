@@ -47,21 +47,25 @@ def qualify_response(lead, prospect_reply, conversation_manager, calendly_url=""
         "lien_calendly": calendly_url or os.getenv("CALENDLY_URL", "https://calendly.com/votre-lien"),
     }, ensure_ascii=False)
 
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=600,
-        system=QUALIFICATION_SYSTEM,
-        messages=[{"role": "user", "content": user_content}]
-    )
-
     try:
+        message = client.messages.create(
+            model=MODEL,
+            max_tokens=600,
+            system=QUALIFICATION_SYSTEM,
+            messages=[{"role": "user", "content": user_content}]
+        )
         result = json.loads(message.content[0].text)
-    except (json.JSONDecodeError, IndexError, KeyError):
+    except (anthropic.APIError, json.JSONDecodeError, IndexError, KeyError):
         result = {
             "action": "reply",
             "score_maturite": 30,
             "message": "Merci pour votre retour. Seriez-vous disponible 20 minutes cette semaine ?\n\nCordialement",
             "raison": "Erreur de parsing, réponse par défaut"
         }
+
+    VALID_ACTIONS = {"reply", "propose_rdv", "archive"}
+    if result.get("action") not in VALID_ACTIONS:
+        result["action"] = "reply"
+    result["score_maturite"] = max(0, min(100, int(result.get("score_maturite", 30))))
 
     return result
