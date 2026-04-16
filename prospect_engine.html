@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProspectEngine — 150 leads qualifiés / session</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #07080a;
+  --bg2:    #0d0f13;
+  --bg3:    #131619;
+  --bg4:    #1a1e24;
+  --bg5:    #21262e;
+  --bord:   rgba(255,255,255,0.06);
+  --bord2:  rgba(255,255,255,0.1);
+  --text:   #e8eaf0;
+  --text2:  #7a8494;
+  --text3:  #3e4958;
+  --cyan:   #00d4ff;
+  --cyan2:  #40e0ff;
+  --cyan-bg:rgba(0,212,255,0.08);
+  --cyan-bd:rgba(0,212,255,0.2);
+  --green:  #00ff87;
+  --grn-bg: rgba(0,255,135,0.07);
+  --grn-bd: rgba(0,255,135,0.2);
+  --amber:  #ffb300;
+  --amb-bg: rgba(255,179,0,0.08);
+  --amb-bd: rgba(255,179,0,0.2);
+  --red:    #ff4757;
+  --red-bg: rgba(255,71,87,0.08);
+  --red-bd: rgba(255,71,87,0.2);
+  --violet: #a78bfa;
+  --vio-bg: rgba(167,139,250,0.08);
+  --syne:   'Syne', sans-serif;
+  --sans:   'Inter', sans-serif;
+  --mono:   'JetBrains Mono', monospace;
+  --r:      12px;
+  --rs:     8px;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* GRAIN */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity:.35;
+}
+
+/* GLOW BG */
+body::before {
+  content:''; position:fixed; top:-20%; left:30%; width:600px; height:600px;
+  background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%);
+  pointer-events:none; z-index:0;
+}
+
+/* HEADER */
+.header {
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--bord);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(7,8,10,0.9);
+  backdrop-filter: blur(20px);
+  position: sticky; top:0; z-index:100;
+}
+.logo { display:flex; align-items:center; gap:12px; }
+.logo-icon {
+  width:36px; height:36px; border-radius:10px;
+  background: var(--cyan-bg); border:1px solid var(--cyan-bd);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.logo-name { font-family:var(--syne); font-size:18px; font-weight:800; letter-spacing:-.3px; }
+.logo-name span { color:var(--cyan); }
+.logo-sub { font-size:11px; color:var(--text3); margin-top:1px; }
+.h-pills { display:flex; gap:6px; align-items:center; }
+.hp {
+  font-size:11px; font-weight:600; padding:4px 11px; border-radius:20px;
+  border:1px solid var(--bord2); color:var(--text3);
+}
+.hp.live { background:var(--grn-bg); border-color:var(--grn-bd); color:var(--green); display:flex;align-items:center;gap:5px; }
+.ldot { width:6px;height:6px;border-radius:50%;background:var(--green);animation:lp 1.5s infinite; }
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TABS */
+.tabs {
+  background:var(--bg2); border-bottom:1px solid var(--bord);
+  padding:0 28px; display:flex; overflow-x:auto; gap:0;
+}
+.tab {
+  font-family:var(--sans); font-size:13px; font-weight:600;
+  color:var(--text3); background:none; border:none;
+  border-bottom:2px solid transparent;
+  padding:13px 16px; cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.tab:hover{color:var(--text2);}
+.tab.on{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* MAIN */
+.main { padding:24px 28px; max-width:1400px; margin:0 auto; position:relative; z-index:1; }
+.panel{display:none;}
+.panel.on{display:block;animation:fu .2s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== SEARCH PANEL ===== */
+.search-hero {
+  display: grid; grid-template-columns: 1fr 360px; gap: 22px; margin-bottom: 28px;
+}
+
+.search-card {
+  background:var(--bg2); border:1px solid var(--bord2);
+  border-radius:var(--r); overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+
+.sc-head {
+  padding:18px 22px; border-bottom:1px solid var(--bord);
+  background:linear-gradient(135deg, var(--bg3), var(--bg2));
+  display:flex; align-items:center; gap:10px;
+}
+.sc-title { font-family:var(--syne); font-size:15px; font-weight:700; color:var(--text); }
+.sc-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+
+.sc-body { padding:22px; display:flex; flex-direction:column; gap:14px; }
+
+.fg { display:flex; flex-direction:column; gap:6px; }
+.fl {
+  font-size:11px; font-weight:600; color:var(--text2);
+  text-transform:uppercase; letter-spacing:.07em;
+}
+.fi, .fs {
+  background:var(--bg3); border:1px solid var(--bord2);
+  border-radius:var(--rs); padding:9px 14px;
+  font-family:var(--sans); font-size:13px; color:var(--text);
+  outline:none; transition:border-color .15s; width:100%;
+}
+.fi:focus,.fs:focus{border-color:var(--cyan-bd);}
+.fi::placeholder{color:var(--text3);}
+
+.fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* Source toggles */
+.sources { display:flex; gap:8px; flex-wrap:wrap; }
+.src-btn {
+  display:flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:var(--rs);
+  border:1px solid var(--bord2); background:var(--bg3);
+  font-size:12px; font-weight:600; color:var(--text3);
+  cursor:pointer; transition:all .12s;
+}
+.src-btn.on { background:var(--cyan-bg); border-color:var(--cyan-bd); color:var(--cyan); }
+.src-btn.on.g { background:var(--grn-bg); border-color:var(--grn-bd); color:var(--green); }
+.src-btn.on.a { background:var(--amb-bg); border-color:var(--amb-bd); color:var(--amber); }
+
+.search-btn {
+  width:100%; padding:14px;
+  background:var(--cyan); border:none; border-radius:var(--rs);
+  font-family:var(--syne); font-size:15px; font-weight:800;
+  color:var(--bg); cursor:pointer; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  letter-spacing:-.2px;
+}
+.search-btn:hover{background:var(--cyan2);transform:translateY(-1px);}
+.search-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* Stats sidebar */
+.stats-sidebar { display:flex; flex-direction:column; gap:12px; }
+.stat-card {
+  background:var(--bg2); border:1px solid var(--bord);
+  border-radius:var(--r); padding:16px 18px;
+  position:relative; overflow:hidden;
+}
+.stat-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+}
+.stat-card.c::before{background:var(--cyan);}
+.stat-card.g::before{background:var(--green);}
+.stat-card.a::before{background:var(--amber);}
+.stat-card.v::before{background:var(--violet);}
+.stat-num{font-family:var(--syne);font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;}
+.stat-num.c{color:var(--cyan);}
+.stat-num.g{color:var(--green);}
+.stat-num.a{color:var(--amber);}
+.stat-num.v{color:var(--violet);}
+.stat-lbl{font-size:12px;color:var(--text3);font-weight:500;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.stat-sub span{color:var(--green);}
+
+/* PROGRESS */
+.progress-bar {
+  background:var(--bg2); border:1px solid var(--bord2);
+  border-radius:var(--r); padding:18px 22px;
+  margin-bottom:20px; display:none;
+}
+.progress-bar.show{display:block;animation:fu .2s ease;}
+.pb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.pb-title{font-family:var(--syne);font-size:14px;font-weight:700;}
+.pb-pct{font-family:var(--mono);font-size:13px;color:var(--cyan);}
+.pb-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.pb-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width .4s ease;}
+.pb-steps{display:flex;gap:16px;flex-wrap:wrap;}
+.pb-step{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;}
+.pb-step.done{color:var(--green);}
+.pb-step.run{color:var(--cyan);}
+.pb-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* RESULTS TABLE */
+.results-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px;
+}
+.rh-left{display:flex;align-items:center;gap:12px;}
+.rh-title{font-family:var(--syne);font-size:17px;font-weight:800;letter-spacing:-.3px;}
+.rh-count{
+  font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;
+  background:var(--cyan-bg);border:1px solid var(--cyan-bd);color:var(--cyan);
+}
+.rh-actions{display:flex;gap:8px;}
+.btn-action{
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  padding:7px 14px;border-radius:var(--rs);cursor:pointer;transition:all .12s;
+}
+.btn-export{background:var(--grn-bg);border:1px solid var(--grn-bd);color:var(--green);}
+.btn-export:hover{background:rgba(0,255,135,0.15);}
+.btn-session{background:var(--cyan);border:none;color:var(--bg);}
+.btn-session:hover{background:var(--cyan2);}
+
+/* Filters bar */
+.filters-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.filter-lbl{font-size:11px;color:var(--text3);margin-right:4px;}
+.flt{
+  font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;
+  border:1px solid var(--bord);background:var(--bg3);color:var(--text3);cursor:pointer;
+}
+.flt.on{background:var(--cyan-bg);border-color:var(--cyan-bd);color:var(--cyan);}
+.flt.on.g{background:var(--grn-bg);border-color:var(--grn-bd);color:var(--green);}
+.flt.on.a{background:var(--amb-bg);border-color:var(--amb-bd);color:var(--amber);}
+.flt.on.r{background:var(--red-bg);border-color:var(--red-bd);color:var(--red);}
+
+/* Lead table */
+.table-wrap{background:var(--bg2);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;}
+.lead-table{width:100%;border-collapse:collapse;}
+.lead-table th{
+  font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);text-align:left;padding:11px 14px;
+  border-bottom:1px solid var(--bord);background:var(--bg3);font-weight:600;
+}
+.lead-table td{
+  padding:11px 14px;font-size:13px;color:var(--text2);
+  border-bottom:1px solid var(--bord);vertical-align:middle;
+}
+.lead-table tr:last-child td{border-bottom:none;}
+.lead-table tr{transition:background .1s;cursor:pointer;}
+.lead-table tr:hover td{background:var(--bg3);}
+.lead-table tr.selected td{background:var(--cyan-bg);}
+
+.score-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:24px;border-radius:6px;font-family:var(--mono);
+  font-size:11px;font-weight:700;
+}
+.s-hot{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
+.s-warm{background:var(--amb-bg);color:var(--amber);border:1px solid var(--amb-bd);}
+.s-cold{background:var(--bg4);color:var(--text3);border:1px solid var(--bord);}
+
+.signal-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;padding:2px 7px;
+  border-radius:6px;margin:1px;
+}
+.sig-new{background:var(--cyan-bg);color:var(--cyan);border:1px solid var(--cyan-bd);}
+.sig-nosite{background:var(--amb-bg);color:var(--amber);border:1px solid var(--amb-bd);}
+.sig-noreview{background:var(--vio-bg);color:var(--violet);}
+.sig-growth{background:var(--grn-bg);color:var(--green);border:1px solid var(--grn-bd);}
+.sig-comp{background:var(--red-bg);color:var(--red);}
+
+.source-dot{
+  width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;
+}
+.sd-sirene{background:var(--cyan);}
+.sd-maps{background:var(--green);}
+.sd-bodacc{background:var(--amber);}
+
+.lead-name{font-weight:600;color:var(--text);font-size:13px;}
+.lead-poste{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* Lead detail panel */
+.detail-panel{
+  background:var(--bg2);border:1px solid var(--bord2);
+  border-radius:var(--r);padding:22px;margin-top:16px;
+  display:none;
+}
+.detail-panel.show{display:block;animation:fu .2s ease;}
+.dp-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+.dp-name{font-family:var(--syne);font-size:20px;font-weight:800;}
+.dp-meta{font-size:12px;color:var(--text3);margin-top:4px;}
+.dp-score-big{
+  font-family:var(--syne);font-size:32px;font-weight:800;
+  color:var(--red);text-align:center;
+}
+.dp-score-lbl{font-size:11px;color:var(--text3);text-align:center;}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.dp-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:8px;}
+.dp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid var(--bord);}
+.dp-row:last-child{border-bottom:none;}
+.dp-key{color:var(--text3);}
+.dp-val{color:var(--text);font-weight:500;text-align:right;}
+.dp-msg{
+  background:var(--bg3);border:1px solid var(--cyan-bd);
+  border-radius:var(--rs);padding:14px;
+  font-size:13px;color:var(--text);line-height:1.6;
+  white-space:pre-line;margin-bottom:12px;
+}
+.dp-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.dp-btn{
+  flex:1;padding:10px;border-radius:var(--rs);
+  font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;border:none;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.dp-btn.primary{background:var(--cyan);color:var(--bg);}
+.dp-btn.secondary{background:var(--grn-bg);border:1px solid var(--grn-bd);color:var(--green);}
+.dp-btn.tertiary{background:var(--bg4);border:1px solid var(--bord2);color:var(--text2);}
+.dp-btn:hover{opacity:.85;transform:translateY(-1px);}
+
+/* SESSION PANEL */
+.session-layout{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+.session-queue{background:var(--bg2);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;}
+.sq-head{padding:12px 16px;border-bottom:1px solid var(--bord);background:var(--bg3);display:flex;justify-content:space-between;align-items:center;}
+.sq-title{font-family:var(--syne);font-size:14px;font-weight:700;}
+.sq-progress{font-family:var(--mono);font-size:11px;color:var(--cyan);}
+.sq-list{max-height:600px;overflow-y:auto;}
+.sq-item{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  border-bottom:1px solid var(--bord);cursor:pointer;transition:background .1s;
+}
+.sq-item:hover{background:var(--bg3);}
+.sq-item.active{background:var(--cyan-bg);border-left:2px solid var(--cyan);}
+.sq-item.done{opacity:.45;}
+.sq-item.done .sq-check{color:var(--green);}
+.sq-rank{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:22px;}
+.sq-info{flex:1;min-width:0;}
+.sq-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sq-city{font-size:11px;color:var(--text3);}
+.sq-check{font-size:14px;color:var(--text3);}
+
+/* Session work area */
+.work-area{background:var(--bg2);border:1px solid var(--bord2);border-radius:var(--r);overflow:hidden;}
+.wa-head{
+  padding:16px 22px;border-bottom:1px solid var(--bord);
+  background:linear-gradient(135deg,rgba(0,212,255,0.06),transparent);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.wa-prospect{font-family:var(--syne);font-size:18px;font-weight:800;}
+.wa-meta{font-size:12px;color:var(--text3);margin-top:4px;}
+.wa-body{padding:22px;display:flex;flex-direction:column;gap:16px;}
+
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.info-card{background:var(--bg3);border:1px solid var(--bord);border-radius:var(--rs);padding:12px 14px;}
+.ic-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px;}
+.ic-value{font-size:13px;font-weight:600;color:var(--text);}
+.ic-value.c{color:var(--cyan);}
+.ic-value.g{color:var(--green);}
+.ic-value.a{color:var(--amber);}
+
+.context-box{background:var(--bg3);border:1px solid var(--bord2);border-radius:var(--rs);padding:14px;}
+.ctx-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--cyan);margin-bottom:8px;}
+.ctx-content{font-size:13px;color:var(--text2);line-height:1.65;}
+
+.msg-area{position:relative;}
+.msg-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green);margin-bottom:8px;}
+.msg-box{
+  width:100%;background:var(--bg3);border:1px solid var(--grn-bd);
+  border-radius:var(--rs);padding:13px 14px;
+  font-family:var(--sans);font-size:13px;color:var(--text);
+  outline:none;resize:vertical;min-height:120px;line-height:1.6;
+  transition:border-color .15s;
+}
+.msg-box:focus{border-color:var(--green);}
+.msg-actions{display:flex;gap:8px;margin-top:8px;}
+
+/* Channel selector */
+.ch-sel{display:flex;gap:6px;}
+.ch-opt{
+  font-size:11px;font-weight:700;padding:6px 12px;border-radius:var(--rs);
+  border:1px solid var(--bord2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .12s;
+}
+.ch-opt.on{background:var(--cyan-bg);border-color:var(--cyan-bd);color:var(--cyan);}
+
+/* Status actions */
+.status-row{display:flex;gap:8px;}
+.status-btn{
+  flex:1;padding:10px;border-radius:var(--rs);border:none;
+  font-family:var(--syne);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;
+}
+.sb-sent{background:var(--grn-bg);border:1px solid var(--grn-bd);color:var(--green);}
+.sb-skip{background:var(--bg4);border:1px solid var(--bord2);color:var(--text3);}
+.sb-later{background:var(--amb-bg);border:1px solid var(--amb-bd);color:var(--amber);}
+.sb-next{background:var(--cyan);color:var(--bg);}
+.status-btn:hover{opacity:.85;}
+
+/* SCENARIO TAB */
+.scenario-wrap{display:grid;grid-template-columns:260px 1fr;gap:22px;}
+.snav{display:flex;flex-direction:column;position:sticky;top:74px;height:fit-content;}
+.sni{display:flex;gap:11px;align-items:flex-start;padding:11px 0;cursor:pointer;transition:opacity .15s;}
+.sni:not(.active){opacity:.4}
+.snc{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bord2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .2s;font-family:var(--syne);}
+.sni.active .snc{border-color:var(--cyan);background:var(--cyan-bg);color:var(--cyan);}
+.sni.done .snc{border-color:var(--green);background:var(--grn-bg);color:var(--green);}
+.snconn{width:1px;height:18px;background:var(--bord2);margin-left:14px;}
+.sntitle{font-size:13px;font-weight:600;margin-top:5px;}
+.snsub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+.scc{background:var(--bg2);border:1px solid var(--bord2);border-radius:var(--r);overflow:hidden;min-height:500px;display:flex;flex-direction:column;}
+.sch{padding:20px 24px;border-bottom:1px solid var(--bord);}
+.sctag{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.sctitle{font-family:var(--syne);font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;}
+.scdesc{font-size:13px;color:var(--text2);line-height:1.6;max-width:540px;}
+.scbody{padding:22px 24px;flex:1;display:flex;flex-direction:column;}
+.cfg{width:100%;border-collapse:collapse;margin-bottom:16px;}
+.cfg th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--bord);background:var(--bg3);font-weight:700;}
+.cfg td{padding:9px 12px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--bord);vertical-align:top;}
+.cfg tr:last-child td{border-bottom:none;}
+.cfg td:first-child{color:var(--text);font-weight:600;}
+.tip{display:flex;gap:10px;padding:11px 14px;background:var(--cyan-bg);border:1px solid var(--cyan-bd);border-radius:var(--rs);font-size:12px;color:var(--text2);line-height:1.5;align-items:flex-start;}
+.scfoot{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-top:1px solid var(--bord);margin-top:auto;}
+.scprog{font-size:12px;color:var(--text3);}
+.bprev,.bnext{font-family:var(--sans);font-size:13px;padding:8px 18px;border-radius:var(--rs);cursor:pointer;transition:all .12s;}
+.bprev{background:none;border:1px solid var(--bord2);color:var(--text2);}
+.bprev:hover{color:var(--text);}
+.bprev:disabled{opacity:.3;cursor:not-allowed;}
+.bnext{background:var(--cyan);border:none;color:var(--bg);font-weight:700;}
+.bnext:hover{background:var(--cyan2);}
+.bnext:disabled{opacity:.3;cursor:not-allowed;}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+@media(max-width:900px){.search-hero,.session-layout,.scenario-wrap{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr 1fr}.snav{display:none}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-name">Prospect<span>Engine</span></div>
+      <div class="logo-sub">150 leads qualifiés · Session quotidienne · 100% local</div>
+    </div>
+  </div>
+  <div class="h-pills">
+    <span class="hp">SIRENE</span>
+    <span class="hp">data.gouv.fr</span>
+    <span class="hp">Bodacc</span>
+    <span class="hp live"><div class="ldot"></div>Sources légales</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="sw('search',this)">🔍 Recherche & Génération</button>
+  <button class="tab" onclick="sw('session',this)">⚡ Session prospection</button>
+  <button class="tab" onclick="sw('scenario',this)">⚙ Architecture technique</button>
+</div>
+
+<div class="main">
+
+<!-- ===== SEARCH ===== -->
+<div class="panel on" id="tab-search">
+  <div class="search-hero">
+    <div class="search-card">
+      <div class="sc-head">
+        <span style="font-size:22px;">🎯</span>
+        <div>
+          <div class="sc-title">Configurer la recherche de prospects</div>
+          <div class="sc-sub">Sources publiques officielles — SIRENE · Bodacc · data.gouv.fr · Places</div>
+        </div>
+      </div>
+      <div class="sc-body">
+
+        <div class="fg">
+          <label class="fl">Secteur d'activité (code APE ou description)</label>
+          <input class="fi" id="f-secteur" placeholder="Ex: 6630Z — Gestion de fonds · ou: cabinet comptable · avocat · notaire…"/>
+        </div>
+
+        <div class="fgrid2">
+          <div class="fg">
+            <label class="fl">Département(s)</label>
+            <input class="fi" id="f-dept" placeholder="Ex: 75, 92, 93 ou Île-de-France"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Ville / Zone</label>
+            <input class="fi" id="f-ville" placeholder="Ex: Paris, Lyon, Bordeaux"/>
+          </div>
+        </div>
+
+        <div class="fgrid3">
+          <div class="fg">
+            <label class="fl">Taille entreprise</label>
+            <select class="fs" id="f-taille">
+              <option value="">Toutes</option>
+              <option value="0">TPE (0-9 salariés)</option>
+              <option value="1">PME (10-49)</option>
+              <option value="2">ETI (50-249)</option>
+              <option value="3">Grande (250+)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Ancienneté max</label>
+            <select class="fs" id="f-age">
+              <option value="">Toutes</option>
+              <option value="3">< 3 mois</option>
+              <option value="6">< 6 mois</option>
+              <option value="12">< 1 an</option>
+              <option value="36">< 3 ans</option>
+              <option value="60">< 5 ans</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Nb de leads cible</label>
+            <select class="fs" id="f-nb">
+              <option value="50">50 leads</option>
+              <option value="100">100 leads</option>
+              <option value="150" selected>150 leads</option>
+              <option value="200">200 leads</option>
+              <option value="300">300 leads</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label class="fl">Sources de données</label>
+          <div class="sources">
+            <div class="src-btn on" onclick="toggleSrc(this)">🏛 SIRENE / INSEE</div>
+            <div class="src-btn on g" onclick="toggleSrc(this)">🗺 Google Places</div>
+            <div class="src-btn on a" onclick="toggleSrc(this)">📋 Bodacc (cessions)</div>
+            <div class="src-btn" onclick="toggleSrc(this)">🔗 API Entreprise</div>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label class="fl">Profil cible pour le scoring IA (CGP)</label>
+          <select class="fs" id="f-profil">
+            <option value="cgp">Cabinet CGP — Dirigeant 45-65 ans, patrimoine >500K€</option>
+            <option value="chef">Chef d'entreprise — Cession potentielle à 5 ans</option>
+            <option value="liberal">Profession libérale — Optimisation fiscale</option>
+            <option value="immo">Investisseur immobilier — Diversification</option>
+            <option value="custom">Profil personnalisé…</option>
+          </select>
+        </div>
+
+        <button class="search-btn" id="search-btn" onclick="runSearch()">
+          ⚡ Générer 150 leads qualifiés
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-sidebar">
+      <div class="stat-card c">
+        <div class="stat-num c" id="s-total">0</div>
+        <div class="stat-lbl">Leads générés</div>
+        <div class="stat-sub">Session actuelle</div>
+      </div>
+      <div class="stat-card g">
+        <div class="stat-num g" id="s-hot">0</div>
+        <div class="stat-lbl">Score chaud (>70)</div>
+        <div class="stat-sub">Priorité <span>haute</span></div>
+      </div>
+      <div class="stat-card a">
+        <div class="stat-num a" id="s-signals">0</div>
+        <div class="stat-lbl">Signaux détectés</div>
+        <div class="stat-sub">Par analyse IA</div>
+      </div>
+      <div class="stat-card v">
+        <div class="stat-num v" id="s-msg">0</div>
+        <div class="stat-lbl">Messages générés</div>
+        <div class="stat-sub">Prêts à envoyer</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--bord);border-radius:var(--r);padding:14px 16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:10px;">Coût de cette session</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bord);"><span style="color:var(--text3)">API SIRENE</span><span style="color:var(--green);font-weight:600;">0.00€</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bord);"><span style="color:var(--text3)">API data.gouv</span><span style="color:var(--green);font-weight:600;">0.00€</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bord);"><span style="color:var(--text3)">Claude API scoring</span><span style="color:var(--cyan);font-weight:600;" id="s-cost">0.00€</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:6px 0;"><span style="color:var(--text)">Total session</span><span style="color:var(--cyan);" id="s-total-cost">0.00€</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progress-bar">
+    <div class="pb-head">
+      <div class="pb-title" id="pb-title">Initialisation…</div>
+      <div class="pb-pct" id="pb-pct">0%</div>
+    </div>
+    <div class="pb-track"><div class="pb-fill" id="pb-fill" style="width:0%"></div></div>
+    <div class="pb-steps" id="pb-steps"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-wrap" style="display:none;">
+    <div class="results-head">
+      <div class="rh-left">
+        <div class="rh-title">Leads générés</div>
+        <div class="rh-count" id="rh-count">0 leads</div>
+      </div>
+      <div class="rh-actions">
+        <button class="btn-action btn-export" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="btn-action btn-session" onclick="goSession()">⚡ Lancer la session →</button>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <span class="filter-lbl">Filtrer :</span>
+      <button class="flt on" onclick="filterLeads('all',this)">Tous</button>
+      <button class="flt on r" onclick="filterLeads('hot',this)">🔴 Chauds</button>
+      <button class="flt on a" onclick="filterLeads('warm',this)">🟡 Tièdes</button>
+      <button class="flt" onclick="filterLeads('cold',this)">🔵 Froids</button>
+      <button class="flt" onclick="filterLeads('new',this)">🆕 Nouveaux</button>
+      <button class="flt" onclick="filterLeads('nosite',this)">🌐 Sans site</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="lead-table">
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th>Entreprise / Dirigeant</th>
+            <th>Secteur</th>
+            <th>Localisation</th>
+            <th>Source</th>
+            <th>Signaux IA</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="detail-panel" id="detail-panel"></div>
+  </div>
+</div>
+
+<!-- ===== SESSION ===== -->
+<div class="panel" id="tab-session">
+  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-family:var(--syne);font-size:20px;font-weight:800;letter-spacing:-.3px;">⚡ Session Prospection</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:4px;">Traitez 150 prospects en 45 minutes · 1 par 1 · Focus total</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--cyan);" id="session-timer">00:00</div>
+      <button class="btn-action btn-session" id="session-start-btn" onclick="startSession()">▶ Démarrer</button>
+    </div>
+  </div>
+
+  <div class="session-layout" id="session-layout">
+    <div class="session-queue">
+      <div class="sq-head">
+        <div class="sq-title">File d'attente</div>
+        <div class="sq-progress" id="sq-prog">0/0</div>
+      </div>
+      <div class="sq-list" id="sq-list">
+        <div style="padding:20px;font-size:12px;color:var(--text3);text-align:center;">
+          Générez des leads d'abord pour lancer la session
+        </div>
+      </div>
+    </div>
+
+    <div class="work-area">
+      <div class="wa-head">
+        <div>
+          <div class="wa-prospect" id="wa-name">En attente du prochain prospect…</div>
+          <div class="wa-meta" id="wa-meta">Lancez une recherche pour commencer</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:var(--syne);font-size:28px;font-weight:800;color:var(--red);" id="wa-score">—</div>
+          <div style="font-size:10px;color:var(--text3);">Score</div>
+        </div>
+      </div>
+      <div class="wa-body" id="wa-body">
+        <div style="text-align:center;padding:40px;color:var(--text3);">
+          <div style="font-size:32px;margin-bottom:12px;">⚡</div>
+          <div style="font-family:var(--syne);font-size:16px;font-weight:700;">Prêt pour la session</div>
+          <div style="font-size:13px;margin-top:8px;">Génèrez vos leads puis cliquez sur "Lancer la session"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCENARIO ===== -->
+<div class="panel" id="tab-scenario">
+  <div class="scenario-wrap">
+    <div class="snav" id="snav"></div>
+    <div class="scc" id="scc"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ===== TABS =====
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='scenario')renderScenario();
+}
+
+function toggleSrc(btn){btn.classList.toggle('on');}
+
+// ===== DATA =====
+const SECTEURS=['Cabinet CGP / Gestion de patrimoine','Expertise comptable','Avocat / Notaire','Dirigeant PME industrie','Dirigeant PME commerce','Profession libérale médicale','Promotion immobilière','Agence immobilière','Conseil en gestion','Holding familiale'];
+const VILLES=['Paris 8e','Paris 16e','Neuilly-sur-Seine','Levallois-Perret','Boulogne-Billancourt','Lyon 6e','Bordeaux','Nantes','Toulouse','Lille','Strasbourg','Aix-en-Provence','Montpellier','Nice','Rennes'];
+const PRENOMS=['François','Philippe','Laurent','Éric','Christophe','Nathalie','Sophie','Catherine','Isabelle','Marie-Claire','Jean-Pierre','Patrick','Michel','Alain','Thierry'];
+const NOMS=['Marchand','Dubois','Laurent','Bernard','Martin','Leroy','Moreau','Simon','Lefebvre','Roux','Blanc','Guérin','Boyer','Faure','Girard'];
+const SIGNAUX=[['🆕 Création récente','sig-new'],['🌐 Sans site web','sig-nosite'],['⭐ Peu d\'avis','sig-noreview'],['📈 Forte croissance','sig-growth'],['🔴 Concurrent dominant','sig-comp']];
+const MESSAGES_TEMPLATES=[
+  (n,s,v)=>`Bonjour ${n},\n\nEn tant que ${s} à ${v}, vous êtes face à des enjeux patrimoniaux que peu de conseillers maîtrisent dans votre secteur.\n\nVotre situation mérite une analyse personnalisée — transmission, optimisation fiscale, diversification.\n\nSeriez-vous disponible 20 minutes cette semaine pour un premier échange sans engagement ?\n\nCordialement`,
+  (n,s,v)=>`Bonjour ${n},\n\nJ'ai repéré votre cabinet à ${v} — votre profil correspond exactement aux dirigeants avec qui j'interviens habituellement.\n\nÀ votre stade, la question de l'optimisation PER et de la transmission patrimoniale devient stratégique.\n\nUn échange rapide pour vous présenter ce que j'ai mis en place pour des profils similaires ?\n\nBien à vous`,
+  (n,s,v)=>`Bonjour ${n},\n\nJe suis spécialisé en gestion de patrimoine pour les dirigeants du secteur ${s} en ${v}.\n\nBeaucoup de mes clients ont découvert des opportunités fiscales importantes qu'ils n'avaient pas identifiées — plafonds PER non utilisés, optimisation IFI, structuration transmission.\n\nJe serais ravi de faire ce point avec vous — 20 minutes suffisent.\n\nCordialement`,
+];
+
+let leads = [];
+let sessionLeads = [];
+let sessionIdx = 0;
+let sessionRunning = false;
+let timerInterval = null;
+let sessionSeconds = 0;
+
+// ===== GENERATE LEADS =====
+function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function rndInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function generateLeadData(nb){
+  const result=[];
+  for(let i=0;i<nb;i++){
+    const prenom=rnd(PRENOMS);
+    const nom=rnd(NOMS);
+    const secteur=rnd(SECTEURS);
+    const ville=rnd(VILLES);
+    const anciennete=rndInt(1,84);
+    const ca=rndInt(150,8500);
+    const nbSignaux=rndInt(0,3);
+    const signaux=[];
+    const usedSig=[];
+    for(let s=0;s<nbSignaux;s++){
+      let sig;
+      do{sig=rnd(SIGNAUX);}while(usedSig.includes(sig[0]));
+      signaux.push(sig);usedSig.push(sig[0]);
+    }
+    const source=rndInt(0,2);
+    const sources=['SIRENE','Places','Bodacc'];
+    const sourceCls=['sd-sirene','sd-maps','sd-bodacc'];
+
+    // Score
+    let score=rndInt(20,95);
+    if(anciennete<6)score=Math.min(score+20,99);
+    if(signaux.some(s=>s[0].includes('Création')))score=Math.min(score+15,99);
+    if(signaux.some(s=>s[0].includes('Sans site')))score=Math.min(score+10,99);
+    if(ca>2000)score=Math.min(score+10,99);
+
+    const msg=MESSAGES_TEMPLATES[rndInt(0,2)](prenom+' '+nom,secteur,ville);
+
+    result.push({
+      id:i+1,
+      nom:`${prenom} ${nom}`,
+      prenom,nomFamille:nom,
+      societe:`${nom} & Associés`+(rndInt(0,1)?' Conseil':''),
+      secteur,ville,
+      anciennete,ca,
+      score,
+      signaux,
+      source:sources[source],
+      sourceCls:sourceCls[source],
+      siret:`${rndInt(10000000,99999999)}${rndInt(100,999)}`,
+      email:`${prenom.toLowerCase()}.${nom.toLowerCase()}@${nom.toLowerCase().replace(/[- ]/g,'')}.fr`,
+      tel:`+33 ${rndInt(1,9)} ${rndInt(10,99)} ${rndInt(10,99)} ${rndInt(10,99)} ${rndInt(10,99)}`,
+      status:'new',
+      msg
+    });
+  }
+  return result.sort((a,b)=>b.score-a.score);
+}
+
+async function runSearch(){
+  const btn=document.getElementById('search-btn');
+  const nb=parseInt(document.getElementById('f-nb').value)||150;
+  btn.disabled=true;btn.textContent='⏳ Génération en cours…';
+
+  const pb=document.getElementById('progress-bar');
+  pb.classList.add('show');
+
+  const steps=[
+    {label:'Interrogation API SIRENE',pct:15,icon:'🏛'},
+    {label:'Filtrage par critères',pct:28,icon:'🔍'},
+    {label:'Enrichissement API Entreprise',pct:42,icon:'📊'},
+    {label:'Croisement Bodacc',pct:55,icon:'📋'},
+    {label:'Google Places — signaux locaux',pct:68,icon:'🗺'},
+    {label:'Scoring IA (Claude API)',pct:82,icon:'🤖'},
+    {label:'Génération des messages',pct:94,icon:'✍'},
+    {label:'Export et tri final',pct:100,icon:'✅'},
+  ];
+
+  const pbSteps=document.getElementById('pb-steps');
+  pbSteps.innerHTML=steps.map(s=>`<div class="pb-step" id="pbs-${s.pct}">${s.icon} ${s.label}</div>`).join('');
+
+  for(const step of steps){
+    document.getElementById('pb-title').textContent=step.icon+' '+step.label+'…';
+    document.getElementById('pb-pct').textContent=step.pct+'%';
+    document.getElementById('pb-fill').style.width=step.pct+'%';
+    document.querySelectorAll('.pb-step').forEach(el=>{
+      const pct=parseInt(el.id.split('-')[1]);
+      if(pct<step.pct)el.className='pb-step done';
+      else if(pct===step.pct)el.className='pb-step run';
+    });
+    await wait(300+Math.random()*400);
+  }
+
+  leads=generateLeadData(nb);
+  sessionLeads=[...leads];
+
+  // Stats
+  const hot=leads.filter(l=>l.score>=70).length;
+  const signals=leads.reduce((a,l)=>a+l.signaux.length,0);
+  document.getElementById('s-total').textContent=nb;
+  document.getElementById('s-hot').textContent=hot;
+  document.getElementById('s-signals').textContent=signals;
+  document.getElementById('s-msg').textContent=nb;
+  const cost=(nb*0.002).toFixed(3);
+  document.getElementById('s-cost').textContent=cost+'€';
+  document.getElementById('s-total-cost').textContent=cost+'€';
+  document.getElementById('rh-count').textContent=nb+' leads';
+
+  renderLeads(leads);
+  pb.style.display='none';
+  document.getElementById('results-wrap').style.display='block';
+  renderSessionQueue();
+
+  btn.disabled=false;btn.innerHTML='⚡ Générer 150 leads qualifiés';
+}
+
+function renderLeads(data){
+  const tbody=document.getElementById('leads-tbody');
+  tbody.innerHTML='';
+  data.forEach((l,i)=>{
+    const scoreClass=l.score>=70?'s-hot':l.score>=45?'s-warm':'s-cold';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span class="score-badge ${scoreClass}">${l.score}</span></td>
+      <td><div class="lead-name">${l.nom}</div><div class="lead-poste">${l.societe}</div></td>
+      <td style="font-size:12px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.secteur}</td>
+      <td style="font-size:12px;">${l.ville}</td>
+      <td><span class="source-dot ${l.sourceCls}"></span><span style="font-size:11px;color:var(--text3);">${l.source}</span></td>
+      <td>${l.signaux.map(s=>`<span class="signal-tag ${s[1]}">${s[0]}</span>`).join('')||'<span style="font-size:11px;color:var(--text3);">—</span>'}</td>
+      <td><button onclick="showDetail(${l.id-1},event)" style="background:var(--cyan-bg);border:1px solid var(--cyan-bd);color:var(--cyan);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;">Voir →</button></td>
+    `;
+    tr.onclick=(e)=>{if(!e.target.tagName.includes('BUTTON'))showDetail(l.id-1,e);};
+    tbody.appendChild(tr);
+  });
+}
+
+function showDetail(idx, e){
+  e && e.stopPropagation();
+  const l=leads[idx];
+  const dp=document.getElementById('detail-panel');
+  const scoreClass=l.score>=70?'var(--red)':l.score>=45?'var(--amber)':'var(--text3)';
+  dp.className='detail-panel show';
+  dp.innerHTML=`
+    <div class="dp-head">
+      <div>
+        <div class="dp-name">${l.nom} <span style="font-size:14px;color:var(--text3);font-family:var(--sans);font-weight:400;">— ${l.societe}</span></div>
+        <div class="dp-meta">📍 ${l.ville} · ${l.secteur} · Source : ${l.source}</div>
+        <div style="margin-top:8px;">${l.signaux.map(s=>`<span class="signal-tag ${s[1]}">${s[0]}</span>`).join('')}</div>
+      </div>
+      <div style="text-align:center;min-width:70px;">
+        <div style="font-family:var(--syne);font-size:40px;font-weight:900;color:${scoreClass};line-height:1;">${l.score}</div>
+        <div style="font-size:10px;color:var(--text3);">Score IA</div>
+      </div>
+    </div>
+    <div class="dp-grid">
+      <div>
+        <div class="dp-section-title">📋 Données entreprise</div>
+        <div class="dp-row"><span class="dp-key">SIRET</span><span class="dp-val" style="font-family:var(--mono);font-size:11px;">${l.siret}</span></div>
+        <div class="dp-row"><span class="dp-key">CA estimé</span><span class="dp-val">${l.ca.toLocaleString('fr-FR')} K€</span></div>
+        <div class="dp-row"><span class="dp-key">Ancienneté</span><span class="dp-val">${l.anciennete} mois</span></div>
+        <div class="dp-row"><span class="dp-key">Email estimé</span><span class="dp-val" style="font-size:11px;">${l.email}</span></div>
+        <div class="dp-row"><span class="dp-key">Téléphone</span><span class="dp-val" style="font-family:var(--mono);font-size:11px;">${l.tel}</span></div>
+      </div>
+      <div>
+        <div class="dp-section-title">🤖 Analyse IA — Pourquoi ce score</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;background:var(--bg3);padding:12px;border-radius:var(--rs);">
+          ${l.score>=70?`<strong style="color:var(--red)">Lead chaud.</strong> `:`<strong style="color:var(--amber)">Lead tiède.</strong> `}
+          ${l.anciennete<6?'Entreprise récente — dirigeant en phase de structuration patrimoniale. ':''}
+          ${l.signaux.some(s=>s[0].includes('Sans site'))?'Absence de présence digitale — besoin de conseil en digitalisation patrimoniale. ':''}
+          ${l.ca>2000?'Chiffre d\'affaires significatif — enjeux fiscaux et transmission importants. ':''}
+          ${l.signaux.some(s=>s[0].includes('Création'))?'Création récente = moment clé pour structurer la stratégie patrimoniale. ':''}
+          Profil compatible CGP — recommandé en priorité ${l.score>=70?'1':'2'}.
+        </div>
+      </div>
+    </div>
+    <div class="msg-label">✍ Message généré par IA — personnalisé selon le profil</div>
+    <textarea class="msg-box" id="dp-msg">${l.msg}</textarea>
+    <div style="display:flex;gap:8px;margin-top:-4px;margin-bottom:12px;">
+      <div class="ch-sel">
+        <div class="ch-opt on" onclick="selCh(this)">💼 LinkedIn</div>
+        <div class="ch-opt" onclick="selCh(this)">📧 Email</div>
+        <div class="ch-opt" onclick="selCh(this)">📱 SMS</div>
+      </div>
+      <button onclick="regenMsg(${idx})" style="background:var(--vio-bg);border:1px solid rgba(167,139,250,0.3);color:var(--violet);border-radius:var(--rs);padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;">↻ Regénérer</button>
+    </div>
+    <div class="dp-actions">
+      <button class="dp-btn primary" onclick="markSent(${idx})">✓ Envoyé — Suivant</button>
+      <button class="dp-btn secondary" onclick="copyMsg()">📋 Copier le message</button>
+      <button class="dp-btn tertiary" onclick="dp.classList.remove('show')">Fermer</button>
+    </div>
+  `;
+  dp.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function selCh(btn){document.querySelectorAll('.ch-opt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function copyMsg(){const t=document.getElementById('dp-msg');t.select();document.execCommand('copy');}
+function markSent(idx){leads[idx].status='sent';showDetail(idx<leads.length-1?idx+1:idx,null);}
+async function regenMsg(idx){
+  const l=leads[idx];
+  const box=document.getElementById('dp-msg');
+  box.style.opacity='.4';
+  await wait(800);
+  l.msg=MESSAGES_TEMPLATES[Math.floor(Math.random()*3)](l.nom,l.secteur,l.ville);
+  box.value=l.msg;
+  box.style.opacity='1';
+}
+
+// Filters
+function filterLeads(type, btn){
+  let filtered;
+  if(type==='all')filtered=leads;
+  else if(type==='hot')filtered=leads.filter(l=>l.score>=70);
+  else if(type==='warm')filtered=leads.filter(l=>l.score>=45&&l.score<70);
+  else if(type==='cold')filtered=leads.filter(l=>l.score<45);
+  else if(type==='new')filtered=leads.filter(l=>l.anciennete<=12);
+  else if(type==='nosite')filtered=leads.filter(l=>l.signaux.some(s=>s[0].includes('Sans site')));
+  renderLeads(filtered||leads);
+}
+
+// Export CSV
+function exportCSV(){
+  if(!leads.length)return;
+  const headers=['Score','Nom','Société','Secteur','Ville','SIRET','Email','Téléphone','Source','Ancienneté (mois)','CA estimé (K€)'];
+  const rows=leads.map(l=>[l.score,l.nom,l.societe,l.secteur,l.ville,l.siret,l.email,l.tel,l.source,l.anciennete,l.ca]);
+  const csv=[headers,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`leads_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ===== SESSION =====
+function renderSessionQueue(){
+  const list=document.getElementById('sq-list');
+  list.innerHTML='';
+  sessionLeads.slice(0,50).forEach((l,i)=>{
+    const div=document.createElement('div');
+    div.className='sq-item'+(i===0?' active':'');
+    div.id='sqi-'+i;
+    const scoreClass=l.score>=70?'color:var(--red)':l.score>=45?'color:var(--amber)':'color:var(--text3)';
+    div.innerHTML=`<div class="sq-rank" style="${scoreClass}">${l.score}</div><div class="sq-info"><div class="sq-name">${l.nom}</div><div class="sq-city">${l.ville}</div></div><div class="sq-check" id="sqc-${i}">○</div>`;
+    div.onclick=()=>loadProspect(i);
+    list.appendChild(div);
+  });
+  document.getElementById('sq-prog').textContent='0/'+Math.min(sessionLeads.length,50);
+  if(sessionLeads.length>0)loadProspect(0);
+}
+
+function goSession(){
+  sw('session',document.querySelectorAll('.tab')[1]);
+  if(sessionLeads.length>0)renderSessionQueue();
+}
+
+function startSession(){
+  if(!sessionLeads.length){alert('Générez d\'abord des leads.');return;}
+  sessionRunning=!sessionRunning;
+  const btn=document.getElementById('session-start-btn');
+  if(sessionRunning){
+    btn.textContent='⏸ Pause';btn.style.background='var(--amber)';
+    timerInterval=setInterval(()=>{
+      sessionSeconds++;
+      const m=String(Math.floor(sessionSeconds/60)).padStart(2,'0');
+      const s=String(sessionSeconds%60).padStart(2,'0');
+      document.getElementById('session-timer').textContent=`${m}:${s}`;
+    },1000);
+  } else {
+    btn.textContent='▶ Reprendre';btn.style.background='var(--cyan)';
+    clearInterval(timerInterval);
+  }
+}
+
+function loadProspect(idx){
+  sessionIdx=idx;
+  document.querySelectorAll('.sq-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('sqi-'+idx);
+  if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+
+  const l=sessionLeads[idx];
+  if(!l)return;
+  document.getElementById('wa-name').textContent=l.nom+' — '+l.societe;
+  document.getElementById('wa-meta').textContent=l.secteur+' · '+l.ville+' · Score '+l.score;
+  document.getElementById('wa-score').textContent=l.score;
+  document.getElementById('wa-score').style.color=l.score>=70?'var(--red)':l.score>=45?'var(--amber)':'var(--text3)';
+
+  const wb=document.getElementById('wa-body');
+  wb.innerHTML=`
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">CA estimé</div><div class="ic-value a">${l.ca.toLocaleString('fr-FR')} K€</div></div>
+      <div class="info-card"><div class="ic-label">Ancienneté</div><div class="ic-value c">${l.anciennete} mois</div></div>
+      <div class="info-card"><div class="ic-label">Source</div><div class="ic-value g">${l.source}</div></div>
+    </div>
+    <div class="context-box">
+      <div class="ctx-title">🤖 Contexte IA — raison du score ${l.score}</div>
+      <div class="ctx-content">
+        ${l.signaux.map(s=>`<span class="signal-tag ${s[1]}" style="margin-right:4px;">${s[0]}</span>`).join('')}<br/><br/>
+        ${l.score>=70?'Lead chaud — ':''}${l.anciennete<6?'Création récente, moment idéal pour structurer. ':''}${l.ca>2000?'CA significatif, enjeux patrimoniaux forts. ':''}${l.signaux.some(s=>s[0].includes('Sans site'))?'Absence digitale — besoin d\'accompagnement. ':''}Profil compatible CGP priorité ${l.score>=70?1:2}.
+      </div>
+    </div>
+    <div class="msg-area">
+      <div class="msg-label">✍ Message personnalisé</div>
+      <textarea class="msg-box" id="session-msg">${l.msg}</textarea>
+      <div class="msg-actions">
+        <div class="ch-sel">
+          <div class="ch-opt on" onclick="selCh(this)">💼 LinkedIn</div>
+          <div class="ch-opt" onclick="selCh(this)">📧 Email</div>
+        </div>
+        <button onclick="regenSessionMsg(${idx})" style="background:var(--vio-bg);border:1px solid rgba(167,139,250,0.3);color:var(--violet);border-radius:var(--rs);padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;">↻ Regénérer</button>
+        <button onclick="copySessionMsg()" style="background:var(--cyan-bg);border:1px solid var(--cyan-bd);color:var(--cyan);border-radius:var(--rs);padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;">📋 Copier</button>
+      </div>
+    </div>
+    <div class="status-row">
+      <button class="status-btn sb-sent" onclick="nextProspect('sent')">✓ Envoyé</button>
+      <button class="status-btn sb-later" onclick="nextProspect('later')">⏰ Plus tard</button>
+      <button class="status-btn sb-skip" onclick="nextProspect('skip')">→ Passer</button>
+      <button class="status-btn sb-next" onclick="nextProspect('next')">Suivant ▶</button>
+    </div>
+  `;
+}
+
+async function regenSessionMsg(idx){
+  const l=sessionLeads[idx];
+  const box=document.getElementById('session-msg');
+  if(!box)return;
+  box.style.opacity='.4';
+  await wait(700);
+  l.msg=MESSAGES_TEMPLATES[Math.floor(Math.random()*3)](l.nom,l.secteur,l.ville);
+  box.value=l.msg;
+  box.style.opacity='1';
+}
+
+function copySessionMsg(){const t=document.getElementById('session-msg');if(t){t.select();document.execCommand('copy');}}
+
+function nextProspect(status){
+  const el=document.getElementById('sqi-'+sessionIdx);
+  if(el){
+    el.classList.add('done');
+    const check=document.getElementById('sqc-'+sessionIdx);
+    if(check)check.textContent=status==='sent'?'✓':status==='later'?'⏰':'→';
+  }
+  const next=sessionIdx+1;
+  document.getElementById('sq-prog').textContent=next+'/'+Math.min(sessionLeads.length,50);
+  if(next<Math.min(sessionLeads.length,50))loadProspect(next);
+  else{
+    document.getElementById('wa-name').textContent='Session terminée ! 🎉';
+    document.getElementById('wa-meta').textContent=`${next} prospects traités`;
+    document.getElementById('wa-body').innerHTML=`<div style="text-align:center;padding:40px;"><div style="font-size:48px;margin-bottom:16px;">🎉</div><div style="font-family:var(--syne);font-size:20px;font-weight:800;color:var(--green);">Session complète !</div><div style="font-size:14px;color:var(--text3);margin-top:8px;">${next} prospects traités · Durée : ${document.getElementById('session-timer').textContent}</div></div>`;
+  }
+}
+
+// ===== SCENARIO =====
+const steps=[
+  {tag:'🏛 Sources officielles',tagC:'var(--cyan)',title:'Acquisition des données — sources 100% légales',desc:'ProspectEngine interroge exclusivement des APIs publiques officielles françaises. Aucun scraping illégal. Toutes les données sont accessibles librement selon la licence Open Data gouvernementale.',cfg:[['API SIRENE (INSEE)','Base nationale des entreprises — 12M+ établissements actifs · Code APE, SIRET, forme juridique, date création, effectifs'],['API data.gouv.fr MCP','300 000+ datasets publics — connecté directement à Claude Code · Interrogation en langage naturel'],['API Entreprise (DINUM)','Données financières officielles — CA, bilans, dirigeants · Accès sur habilitation ou données publiques'],['Bodacc (Bulletin Officiel)','Annonces légales : cessions, créations, procédures collectives · Signal fort d\'opportunité patrimoniale'],['Google Places API','Données locales entreprises — note, avis, présence web, horaires · Plan gratuit : 200€/mois de crédit']]},
+  {tag:'🤖 Scoring IA',tagC:'var(--green)',title:'Qualification et scoring par Claude API',desc:'Pour chaque entreprise identifiée, Claude API analyse 8 critères et produit un score de pertinence CGP de 0 à 100, une liste de signaux d\'opportunité et un message de premier contact personnalisé.',cfg:[['Modèle','claude-sonnet-4-6 · temperature=0.3 · max_tokens=800'],['Critères scorés','Ancienneté (récent = opportunité) · CA estimé · Secteur · Signaux digitaux · Bodacc · Croissance'],['Signaux détectés','Création récente · Sans site web · Peu d\'avis · Concurrent dominant · Cession annoncée'],['Output JSON','{ score: 0-100, signaux: [], message_linkedin: "", message_email: "", priorité: 1|2|3 }'],['Coût','~0.002€ par lead scoré · 150 leads = ~0.30€ total']]},
+  {tag:'⚡ Session quotidienne',tagC:'var(--amber)',title:'Workflow de prospection 45 min/jour',desc:'L\'interface de session présente les 150 leads triés par score. Le conseiller traite 1 prospect à la fois, voit son contexte IA, copie le message en 1 clic et passe au suivant. Rythme : 1 prospect toutes les 18 secondes.',cfg:[['File d\'attente','Leads triés par score décroissant · Visuellement distincts (rouge/ambre/bleu)'],['Interface focus','1 prospect visible à la fois · Contexte IA · Message modifiable · Actions rapides'],['Actions','Envoyé / Plus tard / Passer / Suivant · Statistiques de session en temps réel'],['Timer','Chronomètre de session · Objectif : 150 prospects en 45 minutes'],['Export','CSV enrichi vers CRM (HubSpot, Notion, O2S) · Format configurable']]},
+  {tag:'🏠 Déploiement local',tagC:'var(--violet)',title:'100% local — zéro abonnement SaaS',desc:'ProspectEngine tourne sur le Mac ou PC du conseiller. Aucune donnée dans le cloud. Aucun abonnement. Le seul coût récurrent est l\'API Claude — environ 0.30€ pour 150 leads.',cfg:[['Option A — HTML pur','Ce fichier — ouvre directement dans le navigateur · Données simulées · Aucune dépendance'],['Option B — Python + Streamlit','Appels APIs réels · Claude API intégré · Lance avec: python prospect_engine.py'],['Option C — Claude Code','Connexion MCP data.gouv.fr · Interrogation en langage naturel · Aucun code à écrire'],['Base locale','SQLite — historique des prospects · Statuts · Relances · Synchronisation CSV'],['RGPD','Données publiques B2B · Intérêt légitime · Conformes à la doctrine CNIL pour la prospection B2B']]},
+];
+let cstep=0;
+function renderScenario(){
+  const nav=document.getElementById('snav');
+  if(nav.children.length>0)return;
+  steps.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='sni'+(i===0?' active':'');
+    d.onclick=()=>gs(i);
+    d.innerHTML=`<div><div class="snc">${i+1}</div>${i<steps.length-1?'<div class="snconn"></div>':''}</div><div><div class="sntitle">${s.title}</div><div class="snsub">${s.tag}</div></div>`;
+    nav.appendChild(d);
+  });
+  rs(0);
+}
+function gs(i){cstep=i;document.querySelectorAll('.sni').forEach((el,idx)=>{el.classList.remove('active','done');if(idx<i)el.classList.add('done');else if(idx===i)el.classList.add('active');el.querySelector('.snc').textContent=idx<i?'✓':idx+1;});rs(i);}
+function rs(i){
+  const s=steps[i];
+  document.getElementById('scc').innerHTML=`<div class="sch"><div class="sctag" style="color:${s.tagC}">${s.tag}</div><div class="sctitle">${s.title}</div><div class="scdesc">${s.desc}</div></div><div class="scbody"><table class="cfg"><thead><tr><th>Composante</th><th>Détail</th></tr></thead><tbody>${s.cfg.map(c=>`<tr><td>${c[0]}</td><td>${c[1]}</td></tr>`).join('')}</tbody></table><div class="tip"><span style="color:var(--cyan);flex-shrink:0;">💡</span><span>${getTip(i)}</span></div><div class="scfoot"><span class="scprog">Étape ${i+1} / ${steps.length}</span><div style="display:flex;gap:8px;"><button class="bprev" onclick="gs(${i-1})" ${i===0?'disabled':''}>← Précédent</button><button class="bnext" onclick="gs(${i+1})" ${i===steps.length-1?'disabled':''}>${i===steps.length-1?'✅ Prêt':'Suivant →'}</button></div></div></div>`;
+}
+function getTip(i){const tips=['Pour accéder au MCP data.gouv.fr depuis Claude Code : npx @modelcontextprotocol/inspector puis connecter l\'URL https://mcp.data.gouv.fr. Claude interroge directement les 300 000+ datasets en langage naturel — aucune ligne de code.','Le prompt de scoring doit être configuré une fois pour le profil cible du cabinet. Pour un CGP : "Score ce prospect sur sa pertinence pour un conseiller en gestion de patrimoine indépendant. Priorité aux dirigeants 45-65 ans avec CA > 500K€, créations récentes et absences de présence patrimoniale."','La session de 45 minutes est le cœur du système. L\'objectif n\'est pas d\'envoyer 150 messages — c\'est de sélectionner les 20-30 meilleurs et d\'envoyer des messages parfaitement personnalisés. Qualité > quantité.','Pour la version Python locale (recommandée pour les appels API réels) : pip install streamlit anthropic requests pandas. Lancer avec streamlit run prospect_engine.py. S\'ouvre automatiquement dans le navigateur sur localhost:8501.'];return tips[i];}
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+</script>
+</body>
+</html>
