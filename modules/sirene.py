@@ -9,8 +9,9 @@ def search_companies(secteur="", departement="", nb=150, age_max_mois=None, tail
     params = {"per_page": per_page, "page": 1}
     if secteur:
         params["q"] = secteur
-    if departement:
-        params["departement"] = departement.strip().split(",")[0].strip()
+    dept_filter = departement.strip().split(",")[0].strip() if departement else ""
+    if dept_filter:
+        params["departement"] = dept_filter
 
     results = []
     page = 1
@@ -30,6 +31,9 @@ def search_companies(secteur="", departement="", nb=150, age_max_mois=None, tail
         for item in items:
             company = _parse_company(item)
             if company is None:
+                continue
+            # Client-side department filter (API filter is not always strict)
+            if dept_filter and company.get("departement", "") != dept_filter:
                 continue
             if age_max_mois and company.get("anciennete_mois", 999) > age_max_mois:
                 continue

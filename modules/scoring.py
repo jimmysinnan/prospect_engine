@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import anthropic
 from dotenv import load_dotenv
 
@@ -59,7 +60,11 @@ def score_lead(lead, profil_prompt=None):
     )
 
     try:
-        result = json.loads(message.content[0].text)
+        raw = message.content[0].text.strip()
+        # Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+        result = json.loads(raw)
     except (json.JSONDecodeError, IndexError, KeyError):
         result = {
             "score": 30,
