@@ -1,6 +1,7 @@
 import smtplib
 import imaplib
 import email as email_lib
+import logging
 import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -69,8 +70,8 @@ def fetch_replies(since_hours=1):
             })
 
         mail.logout()
-    except Exception:
-        pass
+    except Exception as e:
+        logging.warning("IMAP fetch_replies error: %s", e)
 
     return replies
 
@@ -78,10 +79,13 @@ def fetch_replies(since_hours=1):
 def _decode_header_str(header_str):
     if not header_str:
         return ""
-    decoded, encoding = decode_header(header_str)[0]
-    if isinstance(decoded, bytes):
-        return decoded.decode(encoding or "utf-8", errors="replace")
-    return str(decoded)
+    parts = []
+    for decoded, encoding in decode_header(header_str):
+        if isinstance(decoded, bytes):
+            parts.append(decoded.decode(encoding or "utf-8", errors="replace"))
+        else:
+            parts.append(str(decoded))
+    return "".join(parts)
 
 
 def _get_body(msg):
