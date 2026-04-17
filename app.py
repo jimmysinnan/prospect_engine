@@ -298,6 +298,22 @@ with tab_search:
         st.rerun()
 
     if st.session_state.leads:
+        from modules.enrichment import enrich_leads_batch
+
+        leads_with_website = [l for l in st.session_state.leads if l.get("website")]
+        if leads_with_website:
+            col_enrich1, col_enrich2 = st.columns([3, 1])
+            with col_enrich1:
+                st.caption(f"💡 {len(leads_with_website)} leads ont un site web — enrichissement disponible (email, tél, réseaux, maturité digitale)")
+            with col_enrich2:
+                if st.button("🔍 Enrichir les leads", use_container_width=True):
+                    enrich_progress = st.progress(0, text="Enrichissement web…")
+                    def on_enrich(i, total):
+                        enrich_progress.progress(i / total, text=f"Enrichissement {i}/{total}…")
+                    enrich_leads_batch(st.session_state.leads, progress_callback=on_enrich)
+                    enrich_progress.progress(1.0, text="✅ Enrichissement terminé")
+                    st.rerun()
+
         leads = st.session_state.leads
         st.subheader(f"Résultats — {len(leads)} leads")
 
@@ -315,7 +331,7 @@ with tab_search:
         elif show_filter == "Récents (<12m)":
             filtered = [l for l in leads if l.get("anciennete_mois", 999) < 12]
 
-        for lead in filtered:
+        for i, lead in enumerate(filtered):
             score = lead.get("score", 0)
             score_color = "🔴" if score >= 70 else "🟡" if score >= 45 else "🔵"
             signaux = lead.get("signaux", [])
@@ -331,6 +347,12 @@ with tab_search:
                     st.markdown(f"**Secteur :** {lead.get('secteur', '')}")
                     st.markdown(f"**Ancienneté :** {lead.get('anciennete_mois', 0)} mois")
                     st.markdown(f"**Source :** {lead.get('source', '')}")
+                    if lead.get("digital_score") is not None:
+                        st.markdown(f"**Maturité digitale :** {lead.get('digital_maturity_label', '')} ({lead.get('digital_score', 0)}/100)")
+                    if lead.get("socials"):
+                        socials = lead.get("socials", {})
+                        social_links = " · ".join(f"[{k.capitalize()}]({v})" for k, v in socials.items())
+                        st.markdown(f"**Réseaux :** {social_links}")
                     st.markdown(f"**Signaux :** {' · '.join(signaux) if signaux else '—'}")
                     if lead.get("tel"):
                         st.markdown(f"**Téléphone :** {lead.get('tel')}")
@@ -343,9 +365,19 @@ with tab_search:
                         st.markdown(f"**Google :** ⭐ {lead.get('rating')} ({lead.get('nb_avis', 0)} avis)")
 
                 st.markdown("**Message LinkedIn :**")
-                st.text_area("", value=lead.get("message_linkedin", ""), height=100, key=f"msg_li_{lead.get('siret', '')}", label_visibility="collapsed")
-                st.markdown("**Message Email :**")
-                st.text_area("", value=lead.get("message_email", ""), height=120, key=f"msg_em_{lead.get('siret', '')}", label_visibility="collapsed")
+                st.text_area("", value=lead.get("message_linkedin", ""), height=100,
+                             key=f"msg_li_{lead.get('siret', '')}_{i}", label_visibility="collapsed")
+
+                email_tabs = st.tabs(["✉️ Email Direct", "📖 Storytelling", "💰 ROI"])
+                with email_tabs[0]:
+                    st.text_area("", value=lead.get("email_variante_1", ""), height=120,
+                                 key=f"em1_{lead.get('siret', '')}_{i}", label_visibility="collapsed")
+                with email_tabs[1]:
+                    st.text_area("", value=lead.get("email_variante_2", ""), height=120,
+                                 key=f"em2_{lead.get('siret', '')}_{i}", label_visibility="collapsed")
+                with email_tabs[2]:
+                    st.text_area("", value=lead.get("email_variante_3", ""), height=120,
+                                 key=f"em3_{lead.get('siret', '')}_{i}", label_visibility="collapsed")
 
 # ===== TAB SESSION =====
 with tab_session:
