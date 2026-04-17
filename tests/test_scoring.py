@@ -36,7 +36,7 @@ def test_score_lead_returns_expected_fields(mock_anthropic_cls):
     assert result["score"] == 82
     assert result["priorite"] == 1
     assert "message_linkedin" in result
-    assert "message_email" in result
+    assert "email_variante_1" in result
     assert isinstance(result["signaux"], list)
 
 @patch("modules.scoring.anthropic.Anthropic")
