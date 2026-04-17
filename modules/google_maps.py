@@ -6,6 +6,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+_DOM_TOM_NAMES = {
+    "971": "Guadeloupe",
+    "972": "Martinique",
+    "973": "Guyane",
+    "974": "La Réunion",
+    "976": "Mayotte",
+}
+
+_DOM_TOM_REGIONS = {
+    "971": "gp",
+    "972": "mq",
+    "973": "gf",
+    "974": "re",
+    "976": "yt",
+}
+
 PLACES_TEXT_SEARCH = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 PLACES_DETAILS = "https://maps.googleapis.com/maps/api/place/details/json"
 
@@ -22,12 +38,16 @@ def search_places(secteur, localisation, nb=50):
     if not api_key:
         raise ValueError("GOOGLE_MAPS_API_KEY non définie dans .env")
 
-    query = f"{secteur} {localisation}"
+    dept_code = localisation.strip()
+    loc_name = _normalize_localisation(dept_code)
+    region = _DOM_TOM_REGIONS.get(dept_code, "fr")
+
+    query = f"{secteur} {loc_name}"
     params = {
         "query": query,
         "key": api_key,
         "language": "fr",
-        "region": "fr",
+        "region": region,
     }
 
     results = []
@@ -192,3 +212,8 @@ def _types_to_label(types):
         if t not in exclude:
             return t.replace("_", " ").capitalize()
     return "Entreprise"
+
+
+def _normalize_localisation(localisation):
+    """Convertit un code département DOM-TOM en nom lisible par Google Maps."""
+    return _DOM_TOM_NAMES.get(localisation.strip(), localisation.strip())
