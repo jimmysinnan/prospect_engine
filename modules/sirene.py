@@ -70,6 +70,10 @@ def _parse_company(item):
         d = dirigeants[0]
         nom_dirigeant = f"{d.get('prenoms', '')} {d.get('nom', '')}".strip()
 
+    dept = siege.get("departement", "").strip()
+    if not dept:
+        dept = _dept_from_postal(siege.get("code_postal", ""))
+
     return {
         "siret": siege.get("siret", ""),
         "nom": nom_dirigeant or item.get("nom_complet", ""),
@@ -77,7 +81,7 @@ def _parse_company(item):
         "secteur": item.get("activite_principale_libelle", ""),
         "naf": item.get("activite_principale", ""),
         "ville": siege.get("libelle_commune", ""),
-        "departement": siege.get("departement", ""),
+        "departement": dept,
         "adresse": siege.get("adresse", ""),
         "effectifs_code": item.get("tranche_effectif_salarie", ""),
         "anciennete_mois": anciennete_mois,
@@ -91,6 +95,18 @@ def _parse_company(item):
         "message_linkedin": "",
         "message_email": "",
     }
+
+
+def _dept_from_postal(code_postal):
+    """Extrait le code département depuis un code postal."""
+    cp = code_postal.strip()
+    if not cp or len(cp) < 2:
+        return ""
+    if cp.startswith("97") and len(cp) >= 3:
+        return cp[:3]
+    if cp.startswith("98") and len(cp) >= 3:
+        return cp[:3]
+    return cp[:2]
 
 
 def _match_taille(code, taille_filter):
