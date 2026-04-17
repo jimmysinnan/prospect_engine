@@ -146,6 +146,25 @@ with tab_search:
 
     with col_form:
         st.subheader("🎯 Configurer la recherche")
+        NAF_PRESETS = {
+            "— Saisir manuellement —": "",
+            "68.31Z — Agences immobilières": "agence immobilière",
+            "56.10A — Restaurants traditionnels": "restaurant",
+            "86.21Z — Médecins généralistes": "médecin généraliste",
+            "86.23Z — Dentistes": "dentiste",
+            "71.11Z — Architectes": "architecte",
+            "70.22Z — Conseil en gestion / coaching": "conseil gestion",
+            "85.59B — Organismes de formation": "organisme formation",
+            "62.01Z — Développeurs / SSII": "développeur informatique",
+            "96.02A — Coiffure": "salon coiffure",
+            "93.13Z — Salles de sport / fitness": "salle de sport",
+            "55.10Z — Hôtels": "hôtel",
+            "43.21A — Électriciens": "électricien",
+            "43.22A — Plombiers": "plombier",
+            "69.20Z — Experts comptables": "expert comptable",
+            "66.22Z — Agents généraux d'assurance": "assurance",
+            "68.20A — Location immobilière": "agence immobilière location",
+        }
         with st.form("search_form"):
             # Source selector
             has_gmaps = bool(os.getenv("GOOGLE_MAPS_API_KEY", ""))
@@ -159,8 +178,16 @@ with tab_search:
             )
             use_gmaps = "Google Maps" in source
 
+            naf_choice = st.selectbox(
+                "Code NAF (optionnel)",
+                options=list(NAF_PRESETS.keys()),
+                index=0,
+                help="Sélectionne un secteur prédéfini ou laisse 'Saisir manuellement'"
+            )
+            secteur_default = NAF_PRESETS[naf_choice]
             secteur = st.text_input(
                 "Secteur d'activité",
+                value=secteur_default,
                 placeholder="Ex: expert comptable, notaire, agence immobilière…"
             )
             col1, col2 = st.columns(2)
